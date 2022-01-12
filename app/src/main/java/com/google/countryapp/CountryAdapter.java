@@ -6,8 +6,6 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,19 +14,21 @@ import com.bumptech.glide.Glide;
 import com.google.countryapp.databinding.ItemListBinding;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-public class CountryAdapter extends RecyclerView.Adapter<CountryAdapter.CountryViewHolder> {
+public class CountryAdapter extends RecyclerView.Adapter<CountryAdapter.CountryViewHolder>  {
 
     Context context;
-    List<Country> countries;
+    List<CountryRoom> countries;
+    List<CountryRoom> countriesfull;
 
 
-    public CountryAdapter(Context context, List<Country> countries) {
+    public CountryAdapter(Context context, List<CountryRoom> countries) {
         this.context = context;
         this.countries = countries;
+        countriesfull = new ArrayList<>();
+        countriesfull.addAll(countries);
     }
 
     @NonNull
@@ -42,16 +42,16 @@ public class CountryAdapter extends RecyclerView.Adapter<CountryAdapter.CountryV
     @Override
     public void onBindViewHolder(@NonNull CountryViewHolder holder, int position) {
 
-        Country country = countries.get(position);
+        CountryRoom country = countries.get(position);
 
-        holder.binding.country.setText(country.getName());
-        holder.binding.capital.setText(country.getCapital());
-        holder.binding.region.setText(country.getRegion());
+        holder.binding.country.setText(country.getCountryName());
+        holder.binding.capital.setText(country.getCapitalName());
+        holder.binding.region.setText(country.getCountryRegion());
         holder.binding.subregion.setText(country.getSubRegion());
-        holder.binding.population.setText(country.getPopulation().toString());
-        Uri flagImageUri = Uri.parse(country.getFlagImage());
+        holder.binding.population.setText( country.getPopulation().toString());
+        Uri flagImageUri = Uri.parse(country.getFlagPng());
         holder.binding.borders.setText(country.getBorders());
-        holder.binding.languages.setText(country.getLanguage());
+        holder.binding.languages.setText(country.getLanguages());
 
         Glide.with(context)
                 .load(flagImageUri)
@@ -88,7 +88,6 @@ public class CountryAdapter extends RecyclerView.Adapter<CountryAdapter.CountryV
         return countries.size();
     }
 
-
     public static class CountryViewHolder extends RecyclerView.ViewHolder
     {
 
@@ -98,40 +97,6 @@ public class CountryAdapter extends RecyclerView.Adapter<CountryAdapter.CountryV
             binding = ItemListBinding.bind(itemView);
         }
     }
+
 }
-//public class CountryAdapter extends ArrayAdapter<Country> {
-//
-//    public CountryAdapter(Activity context, List<Country> countries)
-//    {
-//        super(context,0,countries);
-//    }
-//
-//    @Override
-//    public View getView(int position, View convertView, ViewGroup parent) {
-//
-//
-//        View view = convertView;
-//
-//        if(view == null)
-//        {
-//            view = LayoutInflater.from(getContext()).inflate(
-//                    R.layout.item_list, parent, false
-//            );
-//        }
-//
-//        Country country = getItem(position);
-//
-//        TextView countryName = view.findViewById(R.id.country);
-//        TextView countryCapital = view.findViewById(R.id.capital);
-//        TextView countryRegion = view.findViewById(R.id.region);
-//        TextView countrySubregion = view.findViewById(R.id.subregion);
-//
-//        countryName.setText(country.getName());
-//        countryCapital.setText(country.getCapital());
-//        countryRegion.setText(country.getRegion());
-//        countrySubregion.setText(country.getSubRegion());
-//
-//        return view;
-//    }
-//
-//}
+

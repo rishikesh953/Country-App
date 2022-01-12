@@ -1,6 +1,7 @@
 package com.google.countryapp;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
@@ -10,14 +11,8 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,15 +23,17 @@ import com.google.countryapp.databinding.ActivityMainBinding;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Country>> {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<CountryRoom>> {
 
     ActivityMainBinding binding;
 
     CountryAdapter countryAdapter;
-    List<Country> countries;
+    List<CountryRoom> countries;
+    private final static int ID_COUNTRY_DATA_LOADER = 101;
 
-    private final String COUNTRY_REQUEST_URL = "https://restcountries.com/v2/all";
+    private final static String COUNTRY_REQUEST_URL = "https://restcountries.com/v2/all";
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,77 +47,116 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         binding.mainRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         binding.mainRecyclerView.setAdapter(countryAdapter);
 
-
         ConnectivityManager manager =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
 
+
         if(networkInfo != null)
         {
+            deleteAllFromRoom();
             LoaderManager loaderManager = getLoaderManager();
+            Log.v("MainActivity","Loader Initialisation");
 
-            Log.v("MainActivity","Loader Inisialization");
-
-            loaderManager.initLoader(1, null, this);
+            loaderManager.initLoader(ID_COUNTRY_DATA_LOADER, null, this);
         }
         else
         {
             binding.progressBar.setVisibility(View.GONE);
-            TextView text = findViewById(R.id.text);
-            text.setText("No Internet");
+            bringDataFromRoom();
         }
 
-    }
+        binding.fbDelete.setOnClickListener(v -> {
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-       MenuItem item = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) item.getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
+            AlertDialog.Builder alertDialogBuilder =
+                    new AlertDialog.Builder(MainActivity.this, R.style.AppTheme_Dialog);
+            alertDialogBuilder.setTitle(R.string.delete_confirmation);
+            alertDialogBuilder.setMessage(R.string.warning);
+            alertDialogBuilder.setPositiveButton(R.string.yes, (dialog, which) -> {
+                deleteAllFromRoom();
+                Toast.makeText(MainActivity.this, "All data is deleted.", Toast.LENGTH_SHORT).show();
+            });
+            alertDialogBuilder.setNegativeButton(R.string.no, (dialog, which) -> dialog.cancel());
+            alertDialogBuilder.create().show();
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
         });
-        return true;
+
+
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    private void deleteAllFromRoom() {
 
+        new  Thread(() -> {
 
+            countries.clear();
+            CountryRoomDatabase.getINSTANCE(getApplicationContext())
+                    .countryDao()
+                    .deleteRoom();
+        }).start();
+
+        countryAdapter.notifyDataSetChanged();
+
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private void bringDataFromRoom() {
+
+         new Thread(() -> {
+             countries.clear();
+             countries.addAll(CountryRoomDatabase.getINSTANCE(getApplicationContext())
+                     .countryDao()
+                     .selectAll());
+             countryAdapter.notifyDataSetChanged();
+         }).start();
+
+    }
 
 
         @Override
-    public Loader<List<Country>> onCreateLoader(int id, Bundle args) {
+    public Loader<List<CountryRoom>> onCreateLoader(int id, Bundle args) {
         return new Countryloader(this, COUNTRY_REQUEST_URL);
     }
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
-    public void onLoadFinished(Loader<List<Country>> loader, List<Country> data) {
+    public void onLoadFinished(Loader<List<CountryRoom>> loader, List<CountryRoom> data) {
 
-     countries.clear();
-        countries.addAll(data);
         binding.progressBar.setVisibility(View.GONE);
-     countryAdapter.notifyDataSetChanged();
+        countries.addAll(data);
+        countryAdapter.notifyDataSetChanged();
     }
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
-    public void onLoaderReset(Loader<List<Country>> loader) {
+    public void onLoaderReset(Loader<List<CountryRoom>> loader) {
 
      countries.clear();
 
     }
 
+    public void restart(View view) {
 
-    private static class Countryloader extends AsyncTaskLoader<List<Country>> {
+
+
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        if(networkInfo != null)
+        {
+            binding.progressBar.setVisibility(View.VISIBLE);
+            deleteAllFromRoom();
+            getLoaderManager().restartLoader(ID_COUNTRY_DATA_LOADER, null, this);
+        }
+        else
+        {
+            Toast.makeText(this, "No Internet Connection.", Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
+
+
+    private static class Countryloader extends AsyncTaskLoader<List<CountryRoom>> {
 
         String mUrl;
 
@@ -137,15 +173,31 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         @RequiresApi(api = Build.VERSION_CODES.N)
         @Nullable
         @Override
-        public List<Country> loadInBackground() {
+        public List<CountryRoom> loadInBackground() {
 
-            List<Country> countries;
+            List<CountryRoom> countries;
 
             countries = QueryUtils.fetchCountryData(mUrl);
 
+            CountryRoomDatabase.getINSTANCE(getContext())
+                    .countryDao()
+                    .insertMultipleCountry(countries);
+            Log.v("MainActivity", "Country Data Entered into Database");
 
             return countries;
         }
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        AlertDialog.Builder builder
+                = new AlertDialog
+                .Builder(MainActivity.this, R.style.AppTheme_Dialog);
+        builder.setTitle("Do you want to exit ?")
+                .setPositiveButton(R.string.yes, (dialog, which) -> finishAffinity())
+                .setNegativeButton(R.string.no, (dialog, which) -> dialog.cancel());
+        builder.create().show();
     }
 
 }

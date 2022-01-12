@@ -31,7 +31,7 @@ public class CountryRoom {
 
 
     @ColumnInfo(name = "population")
-    private long population;
+    private Long population;
 
 
     @ColumnInfo(name = "borders")
@@ -41,7 +41,8 @@ public class CountryRoom {
     @ColumnInfo(name = "languages")
     private String languages;
 
-    public CountryRoom(String countryName, String capitalName, String flagPng, String countryRegion, String subRegion, long population, String borders, String languages) {
+    public CountryRoom(String countryName, String capitalName, String flagPng,
+                       String countryRegion, String subRegion, Long population, String borders, String languages) {
         this.countryName = countryName;
         this.capitalName = capitalName;
         this.flagPng = flagPng;
@@ -100,7 +101,7 @@ public class CountryRoom {
         this.subRegion = subRegion;
     }
 
-    public long getPopulation() {
+    public Long getPopulation() {
         return population;
     }
 

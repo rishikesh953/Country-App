@@ -72,5 +72,23 @@
        app:srcCompat="@drawable/ic_baseline_delete_24"
        android:contentDescription="@string/delete" />
 
+   <com.google.android.material.floatingactionbutton.FloatingActionButton
+       android:id="@+id/fb_sync"
+       android:onClick="restart"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginEnd="44dp"
+       android:layout_marginBottom="28dp"
+       android:clickable="true"
+       android:backgroundTint="@color/white"
+       app:layout_constraintBottom_toTopOf="@+id/fb_delete"
+       app:layout_constraintEnd_toEndOf="@+id/main_recyclerView"
+       app:layout_constraintHorizontal_bias="0.0"
+       app:layout_constraintStart_toStartOf="@+id/fb_delete"
+       app:srcCompat="@drawable/ic_baseline_sync_24"
+       android:contentDescription="@string/sync"
+       android:focusable="true"
+       tools:ignore="UsingOnClickInXml" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

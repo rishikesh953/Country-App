@@ -33,7 +33,7 @@ public final class QueryUtils {
 
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public static List<Country> fetchCountryData(String requestUrl) {
+    public static List<CountryRoom> fetchCountryData(String requestUrl) {
         // Create URL object
         URL url = createUrl(requestUrl);
 
@@ -121,7 +121,7 @@ public final class QueryUtils {
 
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public static List<Country> extractCountryInfo(String jsonResponse) {
+    public static List<CountryRoom> extractCountryInfo(String jsonResponse) {
 
         if (TextUtils.isEmpty(jsonResponse)) {
             Log.v(LOG_TAG,"JsonResponse Null");
@@ -129,7 +129,7 @@ public final class QueryUtils {
 
         }
 
-        List<Country> countries = new ArrayList<>();
+        List<CountryRoom> countries = new ArrayList<>();
 
         try {
 
@@ -179,28 +179,6 @@ public final class QueryUtils {
                     borders = "- - -";
                 }
 
-//                JSONArray border = currentCountry.getJSONArray("borders");
-//
-//                String borders = "";
-//
-//
-//                    for(int j = 0; j < border.length(); j++)
-//                    {
-//                        if(j == border.length() -1)
-//                        {
-//                            borders += border.get(j) +".";
-//                        }
-//
-//                        else
-//                        {
-//                            borders += border.get(j) + ", ";
-//                        }
-//
-//                    }
-
-//                    borders = new StringBuilder("No Borders");
-
-
                     String languages = "";
 
                     JSONArray language = currentCountry.getJSONArray("languages");
@@ -216,13 +194,13 @@ public final class QueryUtils {
 
                         else
                         {
-                            languages += name + ", ";
+                            languages  += name + ", ";
                         }
                     }
 
 
-                Country country = new Country(countryName, countryCapital, countryRegion,
-                        countrySubregion, population, flag_image, borders, languages);
+                CountryRoom country = new CountryRoom(countryName, countryCapital, flag_image,
+                        countryRegion, countrySubregion, population, borders, languages);
 
                 countries.add(country);
             }

@@ -16,4 +16,9 @@
     <string name="one">1</string>
     <string name="flag">flag</string>
     <string name="capital_star">capital_star</string>
+    <string name="delete_confirmation">Are you sure?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="warning">You won\'t be able to view the data until you sync again!</string>
+    <string name="sync">sync</string>
 </resources>
