@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Country App</string>
+    <string name="country">Country</string>
+    <string name="capital">Capital</string>
+    <string name="region">Region</string>
+    <string name="sub_region">Sub Region</string>
+    <string name="carribean">Carribean</string>
+    <string name="population">Population</string>
+    <string name="_13000000">13000000</string>
+    <string name="borders">Borders</string>
+    <string name="china_bhutan_pakistan">China, Bhutan, Pakistan</string>
+    <string name="languages">Languages</string>
+    <string name="caribean">Caribean</string>
+    <string name="search">Search</string>
+    <string name="delete">Delete</string>
+    <string name="one">1</string>
+    <string name="flag">flag</string>
+    <string name="capital_star">capital_star</string>
+</resources>
